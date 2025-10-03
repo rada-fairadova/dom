@@ -1,87 +1,43 @@
-import './styles.css';
-import gnomeImage from './assets/gnome.png';
-
-class GnomeGame {
-  constructor() {
-    this.boardSize = 4;
-    this.currentPosition = null;
-    this.gnomeElement = null;
-    this.moveInterval = null;
-    this.init();
-  }
-
-  init() {
-    this.createGameBoard();
-    this.createGnome();
-    this.startMovement();
-  }
-
-  createGameBoard() {
-    const gameBoard = document.getElementById('gameBoard');
-    gameBoard.innerHTML = '';
-
-    for (let i = 0; i < this.boardSize * this.boardSize; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.dataset.index = i;
-      gameBoard.appendChild(cell);
+class Game {
+    constructor() {
+      this.board = document.getElementById('game-board');
+      this.cells = [];
+      this.goblin = null;
+      this.currentPosition = null;
+      this.createBoard();
+      this.startGame();
+    }
+  
+    createBoard() {
+      for (let i = 0; i < 16; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        this.cells.push(cell);
+        this.board.append(cell); 
+      }
+    }
+  
+    startGame() {
+      this.goblin = document.createElement('div');
+      this.goblin.className = 'goblin';
+      this.moveGoblin();
+      
+      setInterval(() => this.moveGoblin(), 1000);
+    }
+  
+    moveGoblin() {
+      if (this.currentPosition !== null) {
+        this.goblin.remove();
+      }
+  
+      let newPosition;
+      do {
+        newPosition = Math.floor(Math.random() * 16);
+      } while (newPosition === this.currentPosition);
+  
+      this.currentPosition = newPosition;
+      this.cells[newPosition].append(this.goblin); 
     }
   }
-
-  createGnome() {
-    this.gnomeElement = document.createElement('img');
-    this.gnomeElement.src = gnomeImage;
-    this.gnomeElement.className = 'gnome';
-    this.gnomeElement.alt = 'Gnome character';
-
-    this.moveToRandomPosition();
-  }
-
-  getRandomPosition() {
-    return Math.floor(Math.random() * this.boardSize * this.boardSize);
-  }
-
-  moveToRandomPosition() {
-    let newPosition;
-
-    do {
-      newPosition = this.getRandomPosition();
-    } while (newPosition === this.currentPosition);
-
-    this.placeGnome(newPosition);
-  }
-
-  placeGnome(position) {
-    const cells = document.querySelectorAll('.cell');
-    
-    if (this.currentPosition !== null) {
-      const currentCell = cells[this.currentPosition];
-      currentCell.classList.remove('with-gnome');
-      currentCell.innerHTML = '';
-    }
-
-    const newCell = cells[position];
-    newCell.appendChild(this.gnomeElement);
-    newCell.classList.add('with-gnome');
-    
-    this.currentPosition = position;
-  }
-
-  startMovement() {
-    this.moveInterval = setInterval(() => {
-      this.moveToRandomPosition();
-    }, 2000);
-  }
-
-  stopMovement() {
-    if (this.moveInterval) {
-      clearInterval(this.moveInterval);
-    }
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  new GnomeGame();
-});
-
-export default GnomeGame;
+  
+  new Game();
